@@ -68,7 +68,8 @@ namespace BangazonWorkforceMVC.Controllers
         // GET: Computers/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            var computer = GetComputerById(id);
+            return View(computer);
         }
 
         // GET: Computers/Create
@@ -137,6 +138,44 @@ namespace BangazonWorkforceMVC.Controllers
             catch
             {
                 return View();
+            }
+        }
+
+        private Computer GetComputerById (int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT
+                                            Id,
+                                            PurchaseDate, 
+                                            IsNull(DecomissionDate, '') AS DecomissionDate, 
+                                            Make,            
+                                            Manufacturer 
+                                       FROM Computer
+                                       WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Computer computer = null;
+
+                    if (reader.Read())
+                    {
+                        computer = new Computer()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                            DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
+                            Make = reader.GetString(reader.GetOrdinal("Make")),
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                        };
+
+                    }
+                    reader.Close();
+                    return computer;
+                }
             }
         }
     }
