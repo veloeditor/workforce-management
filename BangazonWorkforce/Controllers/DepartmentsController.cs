@@ -87,7 +87,7 @@ namespace BangazonWorkforceMVC.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @" INSERT INTO Department (Name, Budget,)
+                        cmd.CommandText = @" INSERT INTO Department (Name, Budget)
                                                 VALUES (@name, @budget);";
                         cmd.Parameters.Add(new SqlParameter("@name", department.Name));
                         cmd.Parameters.Add(new SqlParameter("@budget", department.Budget));
