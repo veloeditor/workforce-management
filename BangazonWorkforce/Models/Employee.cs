@@ -5,7 +5,7 @@ using BangazonWorkforceMVC.Models;
 
 namespace BangazonWorkforceMVC.Models
 {
-    public class Employee
+    public class Employee 
     {
         public int Id { get; set; }
 
