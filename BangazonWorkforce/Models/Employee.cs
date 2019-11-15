@@ -16,7 +16,7 @@ namespace BangazonWorkforceMVC.Models
         public string LastName { get; set; }
         [Required]
         public int DepartmentId { get; set; }
-        public bool IsSuperVisor { get; set; }
+        public bool IsSupervisor { get; set; }
         [Required]
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
