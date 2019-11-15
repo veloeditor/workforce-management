@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonWorkforceMVC.Models;
+using BangazonWorkforceMVC.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
@@ -76,19 +78,53 @@ namespace BangazonWorkforceMVC.Controllers
         // GET: Employees/Create
         public ActionResult Create()
         {
-            return View();
+            var viewModel = new EmployeeCreateViewModel();
+            var departments = GetAllDepartments();
+            var selectItems = departments
+                .Select(department => new SelectListItem
+                {
+                    Text = department.Name,
+                    Value = department.Id.ToString()
+                })
+                .ToList();
+
+            selectItems.Insert(0, new SelectListItem
+            {
+                Text = "Choose department...",
+                Value = "department"
+            });
+            viewModel.Departments = selectItems;
+            return View(viewModel);
         }
 
         // POST: Employees/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(EmployeeCreateViewModel model)
         {
             try
             {
-                // TODO: Add insert logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO Employee
+                ( FirstName, LastName, IsSupervisor, DepartmentId)
+                VALUES
+                ( @firstName, @lastName, @isSupervisor, @departmentId)";
+                        cmd.Parameters.Add(new SqlParameter("@firstName", model.employee.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@lastName", model.employee.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@isSupervisor", model.employee.IsSupervisor));
+                        cmd.Parameters.Add(new SqlParameter("@departmentId", model.employee.DepartmentId));
+                        cmd.ExecuteNonQuery();
 
-                return RedirectToAction(nameof(Index));
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
+
+
             }
             catch
             {
@@ -139,6 +175,33 @@ namespace BangazonWorkforceMVC.Controllers
             catch
             {
                 return View();
+            }
+        }
+
+        private List<Department> GetAllDepartments()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Id, Name FROM Department";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Department> departments = new List<Department>();
+                    while (reader.Read())
+                    {
+                        departments.Add(new Department
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                        });
+                    }
+
+                    reader.Close();
+
+                    return departments;
+                }
             }
         }
     }
