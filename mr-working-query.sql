@@ -1,0 +1,1 @@
+﻿select PurchaseDate, DecomissionDate, Make, Manufacturer, CurrentEmployeeId from Computer
