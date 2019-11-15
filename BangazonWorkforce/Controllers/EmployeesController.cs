@@ -72,7 +72,40 @@ namespace BangazonWorkforceMVC.Controllers
         // GET: Employees/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                        SELECT
+                            Id, InstFirstName, InstLastName, InstSlackHandle, InstCohort, InstSpeciality
+                        FROM Instructor
+                        WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        Instructor instructor = null;
+
+                        if (reader.Read())
+                        {
+                            instructor = new Instructor
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                InstFirstName = reader.GetString(reader.GetOrdinal("InstFirstName")),
+                                InstLastName = reader.GetString(reader.GetOrdinal("InstLastName")),
+                                InstSlackHandle = reader.GetString(reader.GetOrdinal("InstSlackHandle")),
+                                InstCohort = reader.GetInt32(reader.GetOrdinal("InstCohort")),
+                                InstSpeciality = reader.GetString(reader.GetOrdinal("InstSpeciality"))
+                            };
+                        }
+                        reader.Close();
+
+                        return View(instructor);
+                    }
+                }
+            }
         }
 
         // GET: Employees/Create
