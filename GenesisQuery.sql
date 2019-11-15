@@ -172,6 +172,19 @@ INSERT INTO Employee (FirstName, LastName, DepartmentId, IsSuperVisor, StartDate
 INSERT INTO Employee (FirstName, LastName, DepartmentId, IsSuperVisor, StartDate, EndDate) VALUES ('Bryan', 'Nilsen', 4, 'true', '2019-08-08', null);
 INSERT INTO Employee (FirstName, LastName, DepartmentId, IsSuperVisor, StartDate, EndDate) VALUES ('Adam', 'Shaeffer', 3, 'true', '2019-08-08', null);
 
+<<<<<<< HEAD
+INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer, CurrentEmployeeID) VALUES (2019-04-04, null, 'Mac', 'Apple', 2);
+INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer, CurrentEmployeeID) VALUES (2019-04-04, null, 'PC', 'Dell', 4);
+INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer, CurrentEmployeeID) VALUES (2019-04-04, null, 'Mac', 'Apple', 3);
+INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer, CurrentEmployeeID) VALUES (2019-04-04, null, 'PC', 'Dell', 1);
+INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer, CurrentEmployeeID) VALUES (2019-04-04, 2019-06-06, 'PC', 'HP', null);
+
+INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (2, 1, 2019-04-04, null);
+INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (4, 2, 2019-04-04, null);
+INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (3, 3, 2019-04-04, null);
+INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (1, 4, 2019-04-04, null);
+INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (5, 5, 2019-04-04, 2019-06-06);
+=======
 INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer, CurrentEmployeeID) VALUES ('2019-04-04', null, 'Mac', 'Apple', 2);
 INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer, CurrentEmployeeID) VALUES ('2019-04-04', null, 'PC', 'Dell', 4);
 INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer, CurrentEmployeeID) VALUES ('2019-04-04', null, 'Mac', 'Apple', 3);
@@ -183,6 +196,7 @@ INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) 
 INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (3, 3, '2019-04-04', null);
 INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (1, 4, '2019-04-04', null);
 INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (5, 5, '2019-04-04', '2019-06-06');
+>>>>>>> origin
 
 INSERT INTO Customer (FirstName, LastName, CreationDate, LastActiveDate) VALUES ('Joe', 'Snyder', '2019-07-07', '2019-10-10');
 INSERT INTO Customer (FirstName, LastName, CreationDate, LastActiveDate) VALUES ('Michael', 'Stiles', '2019-07-07', '2019-10-10');
@@ -218,6 +232,10 @@ INSERT INTO OrderProduct (OrderId, ProductId) VALUES (4, 2);
 INSERT INTO TrainingProgram (Name, StartDate, EndDate, MaxAttendees) VALUES ('AWS For Enterprise', '2020-01-01', '2020-01-04', 100);
 INSERT INTO TrainingProgram (Name, StartDate, EndDate, MaxAttendees) VALUES ('DevOps For Dummues', '2020-01-01', '2020-01-04', 100);
 INSERT INTO TrainingProgram (Name, StartDate, EndDate, MaxAttendees) VALUES ('Security? Sure!', '2020-01-01', '2020-01-04', 100);
+INSERT INTO TrainingProgram (Name, StartDate, EndDate, MaxAttendees) VALUES ('Harrassment', '2019-01-01', '2019-05-04', 100);
+INSERT INTO TrainingProgram (Name, StartDate, EndDate, MaxAttendees) VALUES ('Customer Service', '2019-01-01', '2019-12-31', 5);
+INSERT INTO TrainingProgram (Name, StartDate, EndDate, MaxAttendees) VALUES ('PingPong Skillz', '2019-01-01', '2020-01-04', 30);
+
 
 INSERT INTO EmployeeTraining (EmployeeId, TrainingProgramId) VALUES (1, 1);
 INSERT INTO EmployeeTraining (EmployeeId, TrainingProgramId) VALUES (1, 2);
@@ -225,3 +243,6 @@ INSERT INTO EmployeeTraining (EmployeeId, TrainingProgramId) VALUES (1, 3);
 INSERT INTO EmployeeTraining (EmployeeId, TrainingProgramId) VALUES (2, 1);
 INSERT INTO EmployeeTraining (EmployeeId, TrainingProgramId) VALUES (2, 2);
 INSERT INTO EmployeeTraining (EmployeeId, TrainingProgramId) VALUES (2, 3); 
+
+
+SELECT Name, StartDate, EndDate, MaxAttendees FROM TrainingProgram
