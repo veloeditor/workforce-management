@@ -2,17 +2,63 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BangazonWorkforceMVC.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
-namespace BangazonWorkforce.Controllers
+namespace BangazonWorkforceMVC.Controllers
 {
     public class TrainingProgramsController : Controller
     {
-        // GET: TrainingPrograms
+        private readonly IConfiguration _config;
+
+        public TrainingProgramsController(IConfiguration config)
+        {
+            _config = config;
+        }
+
+        public SqlConnection Connection
+        {
+            get
+            {
+                return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+            }
+        }
+
+        // GET: Get all TrainingPrograms
         public ActionResult Index()
         {
-            return View();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, Name, StartDate, EndDate, MaxAttendees FROM TrainingProgram
+                                         WHERE StartDate > GetDate()";
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    
+                    List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+
+                    while (reader.Read())
+                    {
+                        TrainingProgram trainingProgram = new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))   
+
+                        };
+                        trainingPrograms.Add(trainingProgram);
+                    }
+                    reader.Close();
+                    return View(trainingPrograms);
+                }
+            }
+            
         }
 
         // GET: TrainingPrograms/Details/5
