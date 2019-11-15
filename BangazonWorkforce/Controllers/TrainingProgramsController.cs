@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonWorkforceMVC.Models;
+using BangazonWorkforceMVC.Models.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -76,19 +77,25 @@ namespace BangazonWorkforceMVC.Controllers
         // POST: TrainingPrograms/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> Create(TrainingProgram newTrainingProgram)
         {
-            try
+            using (SqlConnection conn = Connection)
             {
-                // TODO: Add insert logic here
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO TrainingProgram (Name, StartDate, EndDate, MaxAttendees) VALUES(@name, @startDate, @endDate, @maxAttendees)";
+                    cmd.Parameters.Add(new SqlParameter("@name", newTrainingProgram.Name));
+                    cmd.Parameters.Add(new SqlParameter("@startDate", newTrainingProgram.StartDate));
+                    cmd.Parameters.Add(new SqlParameter("@endDate", newTrainingProgram.EndDate));
+                    cmd.Parameters.Add(new SqlParameter("@maxAttendees", newTrainingProgram.MaxAttendees));
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                    cmd.ExecuteNonQuery();
+                    return RedirectToAction(nameof(Index));
+                }
             }
         }
+       
 
         // GET: TrainingPrograms/Edit/5
         public ActionResult Edit(int id)
