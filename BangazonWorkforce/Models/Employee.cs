@@ -13,7 +13,16 @@ namespace BangazonWorkforceMVC.Models
         public string FirstName { get; set; }
         [Display(Name = "Last Name")]
         [Required]
+
         public string LastName { get; set; }
+        public string FullName { 
+            get 
+            {
+
+                return $"{FirstName} {LastName}";
+            
+            }
+        }
         [Required]
         public int DepartmentId { get; set; }
         public bool IsSupervisor { get; set; }

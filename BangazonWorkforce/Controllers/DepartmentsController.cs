@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration; 
 using BangazonWorkforceMVC.Models;
+using BangazonWorkforceMVC.Models.ViewModels;
+
 
 
 namespace BangazonWorkforceMVC.Controllers
@@ -58,30 +58,45 @@ namespace BangazonWorkforceMVC.Controllers
                 }
             }
         }
-    }
-}
-        // GET: Students/Details/5
-        /* public ActionResult Details(int id)
-        {
-            return View();
-        }
 
-        // GET: Students/Create
+        // GET: Students/Details/5
+        /*  public ActionResult Details(int id)
+         {
+             return View();
+         }
+         */
+
+
+        // GET: Department/Create
         public ActionResult Create()
         {
+            
             return View();
         }
 
-        // POST: Students/Create
+        // POST: Department/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Department department)
         {
             try
             {
-                // TODO: Add insert logic here
 
-                return RedirectToAction(nameof(Index));
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @" INSERT INTO Department (Name, Budget,)
+                                                VALUES (@name, @budget);";
+                        cmd.Parameters.Add(new SqlParameter("@name", department.Name));
+                        cmd.Parameters.Add(new SqlParameter("@budget", department.Budget));
+                        cmd.ExecuteNonQuery();
+                
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+
             }
             catch
             {
@@ -89,51 +104,35 @@ namespace BangazonWorkforceMVC.Controllers
             }
         }
 
-        // GET: Students/Edit/5
-        public ActionResult Edit(int id)
+        private List<Employee> GetAllEmployees()
         {
-            return View();
-        }
-
-        // POST: Students/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
+            using (SqlConnection conn = Connection)
             {
-                // TODO: Add update logic here
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, FirstName, LastName
+                                  FROM Employee";
+                    var reader = cmd.ExecuteReader();
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                    var employees = new List<Employee>();
+                    while (reader.Read())
+                    {
+                        employees.Add(
+                                new Employee()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                }
+                            );
+                    }
 
-        // GET: Students/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+                    reader.Close();
 
-        // POST: Students/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                    return employees;
+                }
             }
         }
     }
 }
-*/
