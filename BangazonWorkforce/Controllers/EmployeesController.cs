@@ -79,30 +79,42 @@ namespace BangazonWorkforceMVC.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
-                        SELECT
-                            Id, InstFirstName, InstLastName, InstSlackHandle, InstCohort, InstSpeciality
-                        FROM Instructor
-                        WHERE Id = @id";
+                       SELECT e.Id, e.FirstName, e.LastName,
+                        d.Name,
+                        ISNULL(c.Manufacturer, 'N/A') AS Manufacturer, ISNULL(c.Make, 'N/A') AS Make
+                        FROM Employee e
+                        LEFT JOIN Department d ON d.Id = e.DepartmentId
+                        LEFT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
+                        LEFT JOIN Computer c on c.Id = ce.ComputerId
+                        WHERE e.Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
                         SqlDataReader reader = cmd.ExecuteReader();
 
-                        Instructor instructor = null;
+                        Employee employee = null;
 
                         if (reader.Read())
                         {
-                            instructor = new Instructor
+                            employee = new Employee
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                InstFirstName = reader.GetString(reader.GetOrdinal("InstFirstName")),
-                                InstLastName = reader.GetString(reader.GetOrdinal("InstLastName")),
-                                InstSlackHandle = reader.GetString(reader.GetOrdinal("InstSlackHandle")),
-                                InstCohort = reader.GetInt32(reader.GetOrdinal("InstCohort")),
-                                InstSpeciality = reader.GetString(reader.GetOrdinal("InstSpeciality"))
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                Department = new Department()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                },
+                                Computer = new Computer()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                                    Make = reader.GetString(reader.GetOrdinal("Make")),
+                                },
                             };
                         }
                         reader.Close();
 
-                        return View(instructor);
+                        return View(employee);
                     }
                 }
             }
