@@ -12,6 +12,7 @@ namespace BangazonWorkforceMVC.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int MaxAttendees { get; set; }
+        public Employee Employee { get; set; } = new Employee();
         public List<Employee> EmployeeList { get; set; } = new List<Employee>();
     }
 }
