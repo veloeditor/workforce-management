@@ -1,10 +1,13 @@
-﻿@model BangazonWorkforceMVC.Models.TrainingProgram
+﻿@using BangazonWorkforceMVC.Models
+@model TrainingProgram
+
 
 @{
     ViewData["Title"] = "Details";
 }
 
 <h1>Details</h1>
+
 
 <div>
     <h4>TrainingProgram</h4>
@@ -41,18 +44,19 @@
             Students Assigned
         </h4>
         <hr />
- 
+        @foreach (Employee employee in Model.EmployeeList)
+        {
             <dl class="row">
                 <dt class="col-sm-2">
-                    @Html.DisplayNameFor(model => model.Employee)
+                  
                 </dt>
                 <dd class="col-sm-10">
-                    @Html.DisplayFor(model => model.EmployeeList[0].FullName)
+                    @Html.DisplayFor(model => employee.FullName)
                 </dd>
-               
+
             </dl>
-        
-    </div>
+        }
+        </div>
 </div>
 <div>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |

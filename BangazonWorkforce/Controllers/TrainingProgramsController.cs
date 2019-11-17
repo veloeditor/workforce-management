@@ -74,7 +74,7 @@ namespace BangazonWorkforceMVC.Controllers
                                                e.FirstName + ' ' + e.LastName as EmployeesEnrolled
                                           FROM TrainingProgram tp LEFT JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id 
                                      LEFT JOIN Employee e ON et.EmployeeId = e.Id
-                                         WHERE tp.Id = @id";
+                                         WHERE tp.Id = @id AND StartDate > GetDate()";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -234,7 +234,7 @@ namespace BangazonWorkforceMVC.Controllers
                                                e.FirstName + ' ' + e.LastName as EmployeesEnrolled
                                           FROM TrainingProgram tp LEFT JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id 
                                      LEFT JOIN Employee e ON et.EmployeeId = e.Id
-                                         WHERE tp.Id = @id";
+                                         WHERE tp.Id = @id WHERE StartDate > GetDate()";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
