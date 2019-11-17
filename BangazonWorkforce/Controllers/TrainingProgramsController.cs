@@ -65,51 +65,57 @@ namespace BangazonWorkforceMVC.Controllers
         // GET: TrainingPrograms/Details/5
         public ActionResult Details(int id)
         {
-           using (SqlConnection conn = Connection)
+            using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT tp.Id, tp.Name as ProgramName, tp.StartDate, tp.EndDate, tp.MaxAttendees, e.Id as EmployeeId, 
+                    cmd.CommandText = @"SELECT tp.Id as TrainingProgramId, tp.Name as ProgramName, tp.StartDate, tp.EndDate, tp.MaxAttendees, e.Id as EmployeeId, 
                                                e.FirstName + ' ' + e.LastName as EmployeesEnrolled
                                           FROM TrainingProgram tp LEFT JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id 
                                      LEFT JOIN Employee e ON et.EmployeeId = e.Id
-                                         WHERE StartDate > GetDate()";
+                                         WHERE tp.Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    TrainingProgram trainingProgram = null;
-                  
+                    Dictionary<int, TrainingProgram> trainingProgram = new Dictionary<int, TrainingProgram>();
 
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        trainingProgram = new TrainingProgram
+                        int trainingProgramId = reader.GetInt32(reader.GetOrdinal("TrainingProgramId"));
+                        if (!trainingProgram.ContainsKey(trainingProgramId))
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("ProgramName")),
-                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees")),
-                            EmployeeList = new List<Employee>(),
-                            Employee = new Employee
+                            TrainingProgram newTrainingProgram = new TrainingProgram
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId")),
+                                Name = reader.GetString(reader.GetOrdinal("ProgramName")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                            };
+                            trainingProgram.Add(trainingProgramId, newTrainingProgram);
+                        }
+                        TrainingProgram fromDictionary = trainingProgram[trainingProgramId];
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            Employee employee = new Employee
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
                                 FirstName = reader.GetString(reader.GetOrdinal("EmployeesEnrolled"))
-                            }
-                        };
-                        reader.Close();
-                        return View(trainingProgram);
-                        
+
+                            };
+                            fromDictionary.EmployeeList.Add(employee);
+                        }
                     }
-
-
+                    reader.Close();
+                    return View(trainingProgram.Values.First());
                 }
             }
 
-            //Get All employees
-            return View();
-        }
+                }
+
 
         // GET: TrainingPrograms/Create
         public ActionResult Create()
@@ -191,7 +197,7 @@ namespace BangazonWorkforceMVC.Controllers
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeletezConfirmed(int id)
+        public ActionResult DeleteConfirmed(int id)
         {
             try
             {
@@ -224,40 +230,50 @@ namespace BangazonWorkforceMVC.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT tp.Id, tp.Name as ProgramName, tp.StartDate, tp.EndDate, tp.MaxAttendees, e.Id as EmployeeId, 
+                    cmd.CommandText = @"SELECT tp.Id as TrainingProgramId, tp.Name as ProgramName, tp.StartDate, tp.EndDate, tp.MaxAttendees, e.Id as EmployeeId, 
                                                e.FirstName + ' ' + e.LastName as EmployeesEnrolled
                                           FROM TrainingProgram tp LEFT JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id 
                                      LEFT JOIN Employee e ON et.EmployeeId = e.Id
-                                         WHERE StartDate > GetDate()";
+                                         WHERE tp.Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    TrainingProgram trainingProgram = null;
+                    Dictionary<int, TrainingProgram> trainingProgram = new Dictionary<int, TrainingProgram>();
 
-
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        trainingProgram = new TrainingProgram
+                        int trainingProgramId = reader.GetInt32(reader.GetOrdinal("TrainingProgramId"));
+                        if (!trainingProgram.ContainsKey(trainingProgramId))
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("ProgramName")),
-                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees")),
-                            EmployeeList = new List<Employee>(),
-                            Employee = new Employee
+                            TrainingProgram newTrainingProgram = new TrainingProgram
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId")),
+                                Name = reader.GetString(reader.GetOrdinal("ProgramName")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                            };
+                            trainingProgram.Add(trainingProgramId, newTrainingProgram);
+                        }
+                        TrainingProgram fromDictionary = trainingProgram[trainingProgramId];
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            Employee employee = new Employee
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
                                 FirstName = reader.GetString(reader.GetOrdinal("EmployeesEnrolled"))
-                            }
-                        };
-                        
 
+                            };
+                            fromDictionary.EmployeeList.Add(employee);
+                        }
                     }
                     reader.Close();
-                        return trainingProgram;
+                    return trainingProgram.Values.First();
+
                 }
+                    
             }
         }
     }
