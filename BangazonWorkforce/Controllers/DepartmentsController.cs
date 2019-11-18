@@ -150,7 +150,7 @@ namespace BangazonWorkforceMVC.Controllers
             }
         }
 
-        private List<Employee> GetAllEmployees()
+        /*private List<Employee> GetAllEmployees()
         {
             using (SqlConnection conn = Connection)
             {
@@ -176,9 +176,7 @@ namespace BangazonWorkforceMVC.Controllers
 
                     reader.Close();
 
-                    return employees;
+                    return employees;*/
                 }
             }
-        }
-    }
-}
+      
