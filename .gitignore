@@ -353,3 +353,4 @@ MigrationBackup/
 .ionide/
 
 scratchquery.sql
+..tmp.drivedownload/
