@@ -13,7 +13,7 @@ using BangazonWorkforceMVC.Models.ViewModels;
 
 namespace BangazonWorkforceMVC.Controllers
 {
-    public class DepartmentsController : Controller
+    public class DepartmentsController : Controller  
     {
         private string _connectionString;
         private SqlConnection Connection
@@ -69,7 +69,8 @@ namespace BangazonWorkforceMVC.Controllers
                 {
                     cmd.CommandText = @"SELECT d.Id as DepartmentId, d.Name as DepartmentName, d.Budget as DepartmentBudget, e.Id as EmployeeId, 
                                                e.FirstName + ' ' + e.LastName as DepartmentEmployee
-                                          FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId";
+                                          FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId
+                                          WHERE d.Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
