@@ -37,7 +37,7 @@ namespace BangazonWorkforceMVC.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT Id, Name, StartDate, EndDate, MaxAttendees FROM TrainingProgram
-                                         WHERE StartDate > GetDate()";
+                               ORDER BY (CASE WHEN StartDate > GetDate() THEN 1 ELSE 0 END) DESC, StartDate ASC";
                     SqlDataReader reader = cmd.ExecuteReader();
                     
                     List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
