@@ -37,7 +37,7 @@ namespace BangazonWorkforceMVC.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                                SELECT e.Id, e.FirstName, e.LastName, d.Name
+                                SELECT e.Id, e.FirstName, e.LastName, d.Name AS DepartmentName
                                 FROM Employee e
                                 LEFT JOIN Department d on d.Id = e.DepartmentId
                                 ";
@@ -54,7 +54,7 @@ namespace BangazonWorkforceMVC.Controllers
                             Department = new Department()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
                             }
                             
                         };
@@ -79,42 +79,61 @@ namespace BangazonWorkforceMVC.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
-                       SELECT e.Id, e.FirstName, e.LastName,
-                        d.Name,
-                        ISNULL(c.Manufacturer, 'N/A') AS Manufacturer, ISNULL(c.Make, 'N/A') AS Make
+                      SELECT DISTINCT e.Id AS EmployeeId, e.FirstName, e.LastName,
+                        d.Name AS DepartmentName, d.Id AS DepartmentId, ISNULL(c.Id, '') AS ComputerId,
+                        ISNULL(c.Manufacturer, 'N/A') AS Manufacturer, ISNULL(c.Make, 'N/A') AS Make,
+						ISNULL(tp.Name, 'N/A') AS ProgramName, ISNULL(tp.Id, '') AS TrainingProgramId
                         FROM Employee e
                         LEFT JOIN Department d ON d.Id = e.DepartmentId
                         LEFT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
                         LEFT JOIN Computer c on c.Id = ce.ComputerId
-                        WHERE e.Id = @id";
+						LEFT JOIN EmployeeTraining et ON et.EmployeeId = e.Id
+						LEFT JOIN TrainingProgram tp ON tp.Id = et.TrainingProgramId
+                        WHERE ce.UnassignDate IS NOT NULL AND e.Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
                         SqlDataReader reader = cmd.ExecuteReader();
 
-                        Employee employee = null;
+                        Dictionary<int, Employee> employee = new Dictionary<int, Employee>();
 
-                        if (reader.Read())
+                        while (reader.Read())
                         {
-                            employee = new Employee
+                            int employeeId = reader.GetInt32(reader.GetOrdinal("EmployeeId"));
+                            if (!employee.ContainsKey(employeeId))
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                Department = new Department()
+                                Employee newEmployee = new Employee
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    Name = reader.GetString(reader.GetOrdinal("Name")),
-                                },
-                                Computer = new Computer()
+                                    Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                    Department = new Department()
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                        Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                                    },
+                                    Computer = new Computer()
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("ComputerId")),
+                                        Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                                        Make = reader.GetString(reader.GetOrdinal("Make")),
+                                    },
+                                };
+                                employee.Add(employeeId, newEmployee);
+                            }
+                            Employee fromDictionary = employee[employeeId];
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("TrainingProgramId")))
+                            {
+                                TrainingProgram trainingProgram = new TrainingProgram
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                                    Make = reader.GetString(reader.GetOrdinal("Make")),
-                                },
-                            };
+                                    Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId")),
+                                    Name = reader.GetString(reader.GetOrdinal("ProgramName"))
+                                };
+                                fromDictionary.ProgramList.Add(trainingProgram);
+                            }
                         }
                         reader.Close();
 
-                        return View(employee);
+                        return View(employee.Values.First());
                     }
                 }
             }
@@ -230,7 +249,7 @@ namespace BangazonWorkforceMVC.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Id, Name FROM Department";
+                    cmd.CommandText = "SELECT Id, Name AS DepartmentName FROM Department";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Department> departments = new List<Department>();
@@ -239,7 +258,7 @@ namespace BangazonWorkforceMVC.Controllers
                         departments.Add(new Department
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
                         });
                     }
 
