@@ -9,6 +9,7 @@ namespace BangazonWorkforceMVC.Models
     {
         public int Id { get; set; }
 
+        [Display(Name = "Department Name")]
         [Required]
         public string Name { get; set; }
 

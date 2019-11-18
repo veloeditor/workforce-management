@@ -199,24 +199,61 @@ namespace BangazonWorkforceMVC.Controllers
         // GET: Employees/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var viewModel = new EmployeeEditViewModel()
+            {
+                employee = GetEmployeeById(id),
+                departments = GetAllDepartments(),
+                computers = GetAllComputers()
+
+            };
+            return View(viewModel);
         }
 
         // POST: Employees/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, IFormCollection collection, EmployeeEditViewModel viewModel)
         {
             try
             {
-                // TODO: Add update logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE Employee
+                                            SET LastName = @lastName,
+                                                DepartmentId = @departmentId
+                                            WHERE Id = @id";
+                                          
+                        cmd.Parameters.Add(new SqlParameter("@lastName", viewModel.employee.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.employee.DepartmentId));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                return RedirectToAction(nameof(Index));
+                        int rowsaffected = cmd.ExecuteNonQuery();
+
+                        cmd.CommandText = @"UPDATE ComputerEmployee
+                                            SET ComputerId = @computerId
+                                            WHERE Id = @id";
+                        
+                        cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.ComputerEmployee.ComputerId));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        if (rowsaffected > 0)
+                        {
+                            return RedirectToAction(nameof(Index));
+                        }
+                        throw new Exception("no rows affected");
+
+                    }
+
+                }
             }
             catch
             {
                 return View();
             }
+
         }
 
         // GET: Employees/Delete/5
@@ -239,6 +276,41 @@ namespace BangazonWorkforceMVC.Controllers
             catch
             {
                 return View();
+            }
+        }
+
+        private Employee GetEmployeeById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, ce.ComputerId
+                                        FROM Employee e
+                                        JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
+                                        WHERE e.Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    var reader = cmd.ExecuteReader();
+
+                    Employee employee = null;
+                    if (reader.Read())
+                    {
+                        employee = new Employee
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("Firstname")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            ComputerEmployee = new ComputerEmployee()
+                            {
+                                ComputerId = reader.GetInt32(reader.GetOrdinal("ComputerId"))
+                            }
+                        };
+                    }
+                    reader.Close();
+                    return employee;
+                }
             }
         }
 
@@ -265,6 +337,34 @@ namespace BangazonWorkforceMVC.Controllers
                     reader.Close();
 
                     return departments;
+                }
+            }
+        }
+
+        private List<Computer> GetAllComputers()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Id, Manufacturer, Make from Computer";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Computer> computers = new List<Computer>();
+                    while (reader.Read())
+                    {
+                        computers.Add(new Computer
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                            Make = reader.GetString(reader.GetOrdinal("Make"))
+                        });
+                    }
+
+                    reader.Close();
+
+                    return computers;
                 }
             }
         }
