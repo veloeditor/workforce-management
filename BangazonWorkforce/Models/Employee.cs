@@ -31,6 +31,6 @@ namespace BangazonWorkforceMVC.Models
         public DateTime EndDate { get; set; }
         public Department Department { get; set; } = new Department();
         public Computer Computer { get; set; }
-
+        public List<TrainingProgram> ProgramList { get; set; } = new List<TrainingProgram>();
     }
 }

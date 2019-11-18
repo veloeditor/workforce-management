@@ -13,7 +13,7 @@ using BangazonWorkforceMVC.Models.ViewModels;
 
 namespace BangazonWorkforceMVC.Controllers
 {
-    public class DepartmentsController : Controller
+    public class DepartmentsController : Controller  
     {
         private string _connectionString;
         private SqlConnection Connection
@@ -59,12 +59,58 @@ namespace BangazonWorkforceMVC.Controllers
             }
         }
 
-        // GET: Students/Details/5
-        /*  public ActionResult Details(int id)
-         {
-             return View();
-         }
-         */
+        // GET: Departments/Details/5
+        public ActionResult Details(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT d.Id as DepartmentId, d.Name as DepartmentName, d.Budget as DepartmentBudget, e.Id as EmployeeId, 
+                                               e.FirstName + ' ' + e.LastName as DepartmentEmployee
+                                          FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId
+                                          WHERE d.Id = @id";
+
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Dictionary<int, Department> department = new Dictionary<int, Department>();
+
+                    while (reader.Read())
+                    {
+                        int departmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId"));
+                        if (!department.ContainsKey(departmentId))
+                        {
+                            Department newDepartment = new Department
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("DepartmentBudget")),
+                            };
+                            department.Add(departmentId, newDepartment);
+                        }
+                        Department fromDictionary = department[departmentId];
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            Employee employee = new Employee
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("DepartmentEmployee")),
+                                
+
+                            };
+                            fromDictionary.employees.Add(employee);
+                        }
+                    }
+                    reader.Close();
+                    return View(department.Values.First());
+                }
+            }
+
+        }
+
 
 
         // GET: Department/Create

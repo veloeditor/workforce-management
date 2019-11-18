@@ -17,6 +17,5 @@ namespace BangazonWorkforceMVC.Models
         public DateTime DecomissionDate { get; set; }
         public string Make { get; set; }
         public string Manufacturer { get; set; }
-        public int CurrentEmployeeId { get; set; }
     }
 }
