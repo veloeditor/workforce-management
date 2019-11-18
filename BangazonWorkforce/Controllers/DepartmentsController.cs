@@ -60,11 +60,11 @@ namespace BangazonWorkforceMVC.Controllers
         }
 
         // GET: Students/Details/5
-        /*  public ActionResult Details(int id)
+         public ActionResult Details(int id)
          {
              return View();
          }
-         */
+         
 
 
         // GET: Department/Create
