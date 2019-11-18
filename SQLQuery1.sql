@@ -1,1 +1,3 @@
-﻿SELECT * FROM Department
+﻿SELECT * FROM Employee
+SELECT * FROM Computer
+SELECT * FROM ComputerEmployee
