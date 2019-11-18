@@ -224,20 +224,20 @@ namespace BangazonWorkforceMVC.Controllers
                         cmd.CommandText = @"UPDATE Employee
                                             SET LastName = @lastName,
                                                 DepartmentId = @departmentId
-                                            WHERE Id = @id";
+                                            WHERE Id = @deptId";
                                           
                         cmd.Parameters.Add(new SqlParameter("@lastName", viewModel.employee.LastName));
                         cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.employee.DepartmentId));
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@deptId", id));
 
                         int rowsaffected = cmd.ExecuteNonQuery();
 
                         cmd.CommandText = @"UPDATE ComputerEmployee
                                             SET ComputerId = @computerId
-                                            WHERE Id = @id";
+                                            WHERE Id = @compId";
                         
                         cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.ComputerEmployee.ComputerId));
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@compId", id));
 
                         if (rowsaffected > 0)
                         {
