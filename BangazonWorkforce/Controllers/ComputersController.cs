@@ -121,18 +121,40 @@ namespace BangazonWorkforceMVC.Controllers
         // GET: Computers/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            var computer = GetComputerById(id);
+            return View(computer);
         }
 
         // POST: Computers/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Computer computer)
         {
             try
             {
-                // TODO: Add delete logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"SELECT Id, EmployeeId, ComputerId, AssignDate, UnassignDate FROM ComputerEmployee WHERE ComputerId = @id;";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        if (reader.Read())
+                        {
+                            reader.Close();
+                            return Ok("You are not allowed to delete computers that have been assigned");
+                        }
+                        else
+                        {
+                            reader.Close();
+                            cmd.CommandText = @"DELETE FROM Computer WHERE Id = @id";
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
             catch
