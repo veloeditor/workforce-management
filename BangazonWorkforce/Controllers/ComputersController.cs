@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonWorkforceMVC.Models;
+using BangazonWorkforceMVC.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -34,33 +35,47 @@ namespace BangazonWorkforceMVC.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT
-                                            Id,
-                                            PurchaseDate, 
-                                            IsNull(DecomissionDate, '') AS DecomissionDate, 
-                                            Make,            
-                                            Manufacturer 
-                                       FROM Computer";
+                    cmd.CommandText = @"SELECT 
+                                            c.PurchaseDate, 
+                                            IsNull(c.DecomissionDate, '') AS DecomissionDate, 
+                                            c.Make,            
+                                            c.Manufacturer,
+                                            isNull(e.FirstName + ' ' +
+                                            e.LastName, '') AS ComputerEmployee,
+                                            e.Id AS EmployeeId,
+                                            c.Id AS ComputerId
+                                       FROM ComputerEmployee ce
+LEFT JOIN Employee e ON e.Id = ce.EmployeeId
+FULL OUTER JOIN Computer c ON c.Id = ce.ComputerId";
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    List<Computer> computers = new List<Computer>();
+                    List<ComputerEmployeeViewModel> computersEmployees = new List<ComputerEmployeeViewModel>();
+
                     while (reader.Read())
                     {
-                        Computer computer = new Computer
+                        ComputerEmployeeViewModel ComputerEmployee = new ComputerEmployeeViewModel();
+                        Computer aComputer = new Computer
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Id = reader.GetInt32(reader.GetOrdinal("ComputerId")),
                             PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
                             DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
                             Make = reader.GetString(reader.GetOrdinal("Make")),
-                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
                         };
-
-                        computers.Add(computer);
-                    }
-
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            Employee anEmployee = new Employee
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("ComputerEmployee")),
+                            };
+                            ComputerEmployee.Employee = anEmployee;
+                        }
+                        ComputerEmployee.Computer = aComputer;
+                        computersEmployees.Add(ComputerEmployee);
+                    };
                     reader.Close();
-
-                    return View(computers);
+                    return View(computersEmployees);
                 }
             }
         }
@@ -154,7 +169,7 @@ namespace BangazonWorkforceMVC.Controllers
             }
         }
 
-        private Computer GetComputerById (int id)
+        private Computer GetComputerById(int id)
         {
             using (SqlConnection conn = Connection)
             {
