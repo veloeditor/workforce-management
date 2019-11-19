@@ -4,10 +4,10 @@
     ViewData["Title"] = @Html.DisplayNameFor(model => model.Id) ;
 }
 
-<h1>Details</h1>
+<h1>@Html.DisplayFor(model => model.Manufacturer)</h1>
+<h1>@Html.DisplayFor(model => model.Make)</h1>
 
 <div>
-    <h4>Computer</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">

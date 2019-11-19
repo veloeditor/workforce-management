@@ -13,7 +13,10 @@ namespace BangazonWorkforceMVC.Models
         public string Name { get; set; }
 
         [Required]
-        public int Budget { get; set; }
+        
+        public decimal Budget { get; set; }
+        public int TotalEmployees { get; set; }
+
         public List<Employee> employees { get; set; } = new List<Employee>();
     }
 }
