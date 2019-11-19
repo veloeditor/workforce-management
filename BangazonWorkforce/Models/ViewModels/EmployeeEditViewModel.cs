@@ -12,6 +12,8 @@ namespace BangazonWorkforceMVC.Models.ViewModels
 
         public List<Computer> computers { get; set; } = new List<Computer>();
 
+        public List<ComputerEmployee> computersEmployees { get; set; } = new List<ComputerEmployee>();
+
         public ComputerEmployee ComputerEmployee = new ComputerEmployee();
         public Employee employee { get; set; } = new Employee();
 

@@ -32,7 +32,7 @@ namespace BangazonWorkforceMVC.Models
         public Department Department { get; set; } = new Department();
 
         public ComputerEmployee ComputerEmployee = new ComputerEmployee();
-        public Computer Computer { get; set; }
+        public Computer Computer { get; set; } = new Computer();
         public List<TrainingProgram> ProgramList { get; set; } = new List<TrainingProgram>();
     }
 }

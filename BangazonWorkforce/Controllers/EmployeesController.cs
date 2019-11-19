@@ -203,7 +203,8 @@ namespace BangazonWorkforceMVC.Controllers
             {
                 employee = GetEmployeeById(id),
                 departments = GetAllDepartments(),
-                computers = GetAllComputers()
+                computers = GetAllComputers(),
+                computersEmployees = GetAllComputerEmployees()
 
             };
             return View(viewModel);
@@ -224,20 +225,19 @@ namespace BangazonWorkforceMVC.Controllers
                         cmd.CommandText = @"UPDATE Employee
                                             SET LastName = @lastName,
                                                 DepartmentId = @departmentId
-                                            WHERE Id = @deptId";
-                                          
+                                            WHERE Id = @id;
+                                            UPDATE ComputerEmployee
+                                            SET ComputerId = @computerId";
+
                         cmd.Parameters.Add(new SqlParameter("@lastName", viewModel.employee.LastName));
                         cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.employee.DepartmentId));
-                        cmd.Parameters.Add(new SqlParameter("@deptId", id));
-
+                        cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.ComputerEmployee.ComputerId));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                      
+                        
                         int rowsaffected = cmd.ExecuteNonQuery();
 
-                        cmd.CommandText = @"UPDATE ComputerEmployee
-                                            SET ComputerId = @computerId
-                                            WHERE Id = @compId";
-                        
-                        cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.ComputerEmployee.ComputerId));
-                        cmd.Parameters.Add(new SqlParameter("@compId", id));
+
 
                         if (rowsaffected > 0)
                         {
@@ -251,6 +251,7 @@ namespace BangazonWorkforceMVC.Controllers
             }
             catch
             {
+                
                 return View();
             }
 
@@ -289,7 +290,7 @@ namespace BangazonWorkforceMVC.Controllers
                     cmd.CommandText = @"SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, ce.ComputerId
                                         FROM Employee e
                                         JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
-                                        WHERE e.Id = @id";
+                                        WHERE e.Id = @id AND ce.UnassignDate IS NULL";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     var reader = cmd.ExecuteReader();
 
@@ -304,6 +305,7 @@ namespace BangazonWorkforceMVC.Controllers
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             ComputerEmployee = new ComputerEmployee()
                             {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 ComputerId = reader.GetInt32(reader.GetOrdinal("ComputerId"))
                             }
                         };
@@ -365,6 +367,34 @@ namespace BangazonWorkforceMVC.Controllers
                     reader.Close();
 
                     return computers;
+                }
+            }
+        }
+        private List<ComputerEmployee> GetAllComputerEmployees()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Id, EmployeeId, ComputerId FROM ComputerEmployee";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<ComputerEmployee> computersEmployees = new List<ComputerEmployee>();
+                    while (reader.Read())
+                    {
+                        computersEmployees.Add(new ComputerEmployee
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            EmployeeId = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                            ComputerId = reader.GetInt32(reader.GetOrdinal("ComputerId")),
+                            
+                        });
+                    }
+
+                    reader.Close();
+
+                    return computersEmployees;
                 }
             }
         }

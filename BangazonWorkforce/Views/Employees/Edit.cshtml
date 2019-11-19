@@ -22,9 +22,9 @@
                     <span asp-validation-for="employee.DepartmentId" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="employee.ComputerEmployee.ComputerId" class="control-label"></label>
-                    <select asp-for="employee.ComputerEmployee.ComputerId" asp-items="@Model.ComputerOptions"></select>
-                    <span asp-validation-for="employee.ComputerEmployee.ComputerId" class="text-danger"></span>
+                    <label asp-for="ComputerEmployee.ComputerId" class="control-label"></label>
+                    <select asp-for="ComputerEmployee.ComputerId" asp-items="@Model.ComputerOptions"></select>
+                    <span asp-validation-for="ComputerEmployee.ComputerId" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Save" class="btn btn-primary" />
