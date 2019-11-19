@@ -10,6 +10,7 @@ namespace BangazonWorkforceMVC.Models.ViewModels
     public class ComputerCreateViewModel
     {
         public Computer Computer { get; set; }
+        public Employee Employee { get; set; }
         public List<Employee> Employees { get; set; } = new List<Employee>();
 
         public List<SelectListItem> AllEmployeeOptions

@@ -21,3 +21,7 @@ SELECT
                                        FROM ComputerEmployee ce
 LEFT JOIN Employee e ON e.Id = ce.EmployeeId
 FULL OUTER JOIN Computer c ON c.Id = ce.ComputerId
+
+
+select * from ComputerEmployee
+

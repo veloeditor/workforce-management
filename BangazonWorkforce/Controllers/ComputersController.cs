@@ -6,6 +6,7 @@ using BangazonWorkforceMVC.Models;
 using BangazonWorkforceMVC.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
@@ -45,8 +46,8 @@ namespace BangazonWorkforceMVC.Controllers
                                             e.Id AS EmployeeId,
                                             c.Id AS ComputerId
                                        FROM ComputerEmployee ce
-LEFT JOIN Employee e ON e.Id = ce.EmployeeId
-FULL OUTER JOIN Computer c ON c.Id = ce.ComputerId";
+                                       LEFT JOIN Employee e ON e.Id = ce.EmployeeId
+                                       FULL OUTER JOIN Computer c ON c.Id = ce.ComputerId";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<ComputerEmployeeViewModel> computersEmployees = new List<ComputerEmployeeViewModel>();
@@ -90,13 +91,19 @@ FULL OUTER JOIN Computer c ON c.Id = ce.ComputerId";
         // GET: Computers/Create
         public ActionResult Create()
         {
-            return View();
+            var viewModel = new ComputerCreateViewModel();
+            var employees = GetAllEmployees();
+            var selectItems = employees.ToList();
+
+            viewModel.Employees = selectItems;
+            return View(viewModel);
+
         }
 
         // POST: Computers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Computer computer)
+        public async Task<ActionResult> Create(ComputerCreateViewModel computerEmployee)
         {
             try
             {
@@ -107,11 +114,21 @@ FULL OUTER JOIN Computer c ON c.Id = ce.ComputerId";
                     {
                         cmd.CommandText = @"INSERT INTO Computer
                                                 (Make, Manufacturer, PurchaseDate, DecomissionDate)
+                                            OUTPUT INSERTED.Id
                                             VALUES
-                                                (@make, @manufacturer, @purchaseDate, null )";
-                        cmd.Parameters.Add(new SqlParameter("@make", computer.Make));
-                        cmd.Parameters.Add(new SqlParameter("@manufacturer", computer.Manufacturer));
-                        cmd.Parameters.Add(new SqlParameter("@purchaseDate", computer.PurchaseDate));
+                                                (@make, @manufacturer, @purchaseDate, null);";
+                        cmd.Parameters.Add(new SqlParameter("@make", computerEmployee.Computer.Make));
+                        cmd.Parameters.Add(new SqlParameter("@manufacturer", computerEmployee.Computer.Manufacturer));
+                        cmd.Parameters.Add(new SqlParameter("@purchaseDate", computerEmployee.Computer.PurchaseDate));
+
+                        computerEmployee.Computer.Id = (int)await cmd.ExecuteScalarAsync();
+
+                        cmd.CommandText = @"INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate)
+                                            VALUES (@employeeId, @computerId, GETDATE(), null)";
+
+                        cmd.Parameters.Add(new SqlParameter("@computerId", computerEmployee.Computer.Id));
+                        cmd.Parameters.Add(new SqlParameter("@employeeId", computerEmployee.Employee.Id));
+
                         cmd.ExecuteNonQuery();
 
                         return RedirectToAction(nameof(Index));
@@ -203,6 +220,38 @@ FULL OUTER JOIN Computer c ON c.Id = ce.ComputerId";
                     }
                     reader.Close();
                     return computer;
+                }
+            }
+        }
+
+        private List<Employee> GetAllEmployees()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT
+                                            Id, FirstName, LastName, DepartmentId, IsSupervisor
+                                       FROM Employee";
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    List<Employee> employees = new List<Employee>();
+
+                    while (reader.Read())
+                    {
+                        Employee employee = new Employee()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                        };
+                        employees.Add(employee);
+                    }
+                    reader.Close();
+                    return employees;
                 }
             }
         }
