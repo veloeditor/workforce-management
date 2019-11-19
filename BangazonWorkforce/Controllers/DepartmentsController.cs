@@ -37,23 +37,24 @@ namespace BangazonWorkforceMVC.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT e.DepartmentId as DepartmentId, d.Budget as Budget, d.Name as DepartmentName,
+                    cmd.CommandText = @"SELECT e.DepartmentId as DepartmentId, d.Budget as Budget, d.Name as Department,
                                       COUNT(*) as TotalEmployees
                                           FROM Employee e INNER JOIN Department d on e.DepartmentId = d.Id
-                                         GROUP BY e.DepartmentId, d.Name, d.Budget";
+                                          GROUP BY e.DepartmentId, d.Name, d.Budget";
 
                     var reader = cmd.ExecuteReader();
                     var departments = new List<Department>();
-               
                     
+                    
+
                     while (reader.Read())
                     {
                         departments.Add(
                             new Department
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                                Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
-                                Budget = reader.GetDecimal(reader.GetOrdinal("Budget")),
+                                Name = reader.GetString(reader.GetOrdinal("Department")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
                                 TotalEmployees = reader.GetInt32(reader.GetOrdinal("TotalEmployees"))
                             });
                     }
@@ -75,12 +76,12 @@ namespace BangazonWorkforceMVC.Controllers
                     cmd.CommandText = @"SELECT d.Id as DepartmentId, d.Name as Department, d.Budget as Budget, e.Id as EmployeeId, 
                                                e.FirstName + ' ' + e.LastName as Employee
                                           FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId
-                                          WHERE d.Id = @id";
+                                         WHERE d.Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    Dictionary<decimal, Department> department = new Dictionary<decimal, Department>();
+                    Dictionary<int, Department> department = new Dictionary<int, Department>();
 
                     while (reader.Read())
                     {
@@ -91,7 +92,7 @@ namespace BangazonWorkforceMVC.Controllers
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                                 Name = reader.GetString(reader.GetOrdinal("Department")),
-                                Budget = reader.GetDecimal(reader.GetOrdinal("DepartmentBudget"))
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                             };
                             department.Add(departmentId, newDepartment);
                         }

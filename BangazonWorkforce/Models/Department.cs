@@ -15,6 +15,7 @@ namespace BangazonWorkforceMVC.Models
         [Required]
         
         public decimal Budget { get; set; }
+       
         public int TotalEmployees { get; set; }
 
         public List<Employee> employees { get; set; } = new List<Employee>();
