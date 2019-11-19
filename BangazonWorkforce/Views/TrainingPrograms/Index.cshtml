@@ -38,10 +38,17 @@
                             @Html.DisplayFor(modelItem => item.Name)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.StartDate)
+                            @{
+                                var startDate = item.StartDate.ToShortDateString();
+                                @Html.DisplayFor(modelItem => startDate)
+                            }
+
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.EndDate)
+                            @{
+                                var endDate = item.EndDate.ToShortDateString();
+                                @Html.DisplayFor(modelItem => endDate)
+                            }
                         </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.MaxAttendees)
@@ -57,8 +64,12 @@
                 </tr>
             }
         <tr>
-            <td><a href="/TrainingPrograms?include=past">View Past Programs</a> |
-            <a href="/TrainingPrograms">View Current/Future Programs</a></td>
+           
+            <td>
+                @Html.ActionLink("View Past Programs", "Index", new { filter = "past" }) |
+                @Html.ActionLink("View Future Programs", "Index", new {})
+
+            </td>
         </tr>
         </tbody>
     </table>

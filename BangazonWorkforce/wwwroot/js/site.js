@@ -2,3 +2,7 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
+
+function goBack() { window.location = 'Index.aspx' }
+
+setTimeout('goBack()',5*1000); 

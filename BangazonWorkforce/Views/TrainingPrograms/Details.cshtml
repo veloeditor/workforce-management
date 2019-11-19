@@ -13,51 +13,62 @@
     <h4>TrainingProgram</h4>
     <hr />
     <dl class="row">
-     
-        <dt class = "col-sm-2">
+
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Name)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.StartDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.StartDate)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.EndDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.EndDate)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.MaxAttendees)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.MaxAttendees)
         </dd>
     </dl>
-    <div>
-        <h4>
-            Students Assigned
-        </h4>
-        <hr />
-        @foreach (Employee employee in Model.EmployeeList)
-        {
-            <dl class="row">
-                <dt class="col-sm-2">
-                  
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(model => employee.FullName)
-                </dd>
-
-            </dl>
-        }
-        </div>
 </div>
+    <table class="table">
+        <h6>Employees Enrolled</h6>
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Employee.FirstName)
+                </th>
+
+                <th>
+                    @Html.DisplayNameFor(model => model.Employee.DepartmentId)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Employee employee in Model.EmployeeList)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => employee.FirstName)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => employee.Department.Name)
+                    </td>
+                </tr>
+            }
+        </tbody>
+       </table>
+
 <div>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     <a asp-action="Index">Back to List</a>
