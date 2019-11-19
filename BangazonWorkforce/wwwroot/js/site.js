@@ -3,6 +3,4 @@
 
 // Write your JavaScript code.
 
-function goBack() { window.location = 'Index.aspx' }
 
-setTimeout('goBack()',5*1000); 

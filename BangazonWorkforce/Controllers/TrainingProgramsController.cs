@@ -190,33 +190,17 @@ namespace BangazonWorkforceMVC.Controllers
         // GET: TrainingPrograms/Edit/5
         public ActionResult Edit(int id)
         {
-            TrainingProgram trainingProgram = GetTrainingProgram(id);
-            DateTime currentDate = DateTime.Now;
-
-            if (trainingProgram.StartDate > currentDate)
-            {
-                TrainingProgramEditViewModel viewModel = new TrainingProgramEditViewModel
-                {
-                    TrainingProgram = trainingProgram
-                };
-                return View(trainingProgram);
-            }
-            return Ok("You are not allowed to edit past programs. Hit back on your browser to return...");
-
-
+            TrainingProgram trainingProgram = GetTrainingProgramById(id);
+            return View(trainingProgram);
         }
-        
-    
 
         // POST: TrainingPrograms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, TrainingProgramEditViewModel viewModel)
+        public ActionResult Edit(int id, TrainingProgram updatedTrainingProgram)
         {
-            TrainingProgram trainingProgram = viewModel.TrainingProgram;
             try
             {
-                var updatedTrainingProgram = viewModel.TrainingProgram;
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
@@ -291,7 +275,7 @@ namespace BangazonWorkforceMVC.Controllers
                                                e.FirstName + ' ' + e.LastName as EmployeesEnrolled
                                           FROM TrainingProgram tp LEFT JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id 
                                      LEFT JOIN Employee e ON et.EmployeeId = e.Id
-                                         WHERE tp.Id = @id AND StartDate > GetDate()";
+                                         WHERE tp.Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -367,37 +351,6 @@ namespace BangazonWorkforceMVC.Controllers
             }
 
         }
-        private TrainingProgram GetTrainingProgram(int id)
-        {
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"SELECT tp.Id, tp.Name, tp.StartDate, tp.EndDate, tp.MaxAttendees                               
-                                        FROM TrainingProgram tp
-                                        WHERE tp.Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    TrainingProgram trainingProgram = null;
-
-                    if (reader.Read())
-                    {
-                        trainingProgram = new TrainingProgram
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
-                        };
-                    }
-
-                    reader.Close();
-                    return trainingProgram;
-                }
-            }
-        }
+       
     }
 }
