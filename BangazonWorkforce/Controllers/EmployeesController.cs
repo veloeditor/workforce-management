@@ -231,7 +231,7 @@ namespace BangazonWorkforceMVC.Controllers
 
                         cmd.Parameters.Add(new SqlParameter("@lastName", viewModel.employee.LastName));
                         cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.employee.DepartmentId));
-                        cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.ComputerEmployee.ComputerId));
+                        cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.employee.ComputerEmployee.ComputerId));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
                       
                         
