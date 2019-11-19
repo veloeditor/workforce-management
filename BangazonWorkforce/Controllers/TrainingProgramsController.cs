@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonWorkforceMVC.Models;
-using BangazonWorkforceMVC.Models.ViewModel; 
+using BangazonWorkforceMVC.Models.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -29,35 +29,67 @@ namespace BangazonWorkforceMVC.Controllers
         }
 
         // GET: Get all TrainingPrograms
-        public ActionResult Index()
+        
+        public ActionResult Index(string include)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, Name, StartDate, EndDate, MaxAttendees FROM TrainingProgram
-                               ORDER BY (CASE WHEN StartDate > GetDate() THEN 1 ELSE 0 END) DESC, StartDate ASC";
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    
-                    List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
-
-                    while (reader.Read())
+                    if (include == "past")
                     {
-                        TrainingProgram trainingProgram = new TrainingProgram
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))   
+                        cmd.CommandText = @"SELECT Id, Name, StartDate, EndDate, MaxAttendees FROM TrainingProgram
+                                                       WHERE StartDate < GetDate()";
 
-                        };
-                        trainingPrograms.Add(trainingProgram);
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+
+                        while (reader.Read())
+                        {
+                            TrainingProgram trainingProgram = new TrainingProgram
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+
+                            };
+                            trainingPrograms.Add(trainingProgram);
+                        }
+                        reader.Close();
+                        return View(trainingPrograms);
                     }
-                    reader.Close();
-                    return View(trainingPrograms);
+                    else
+                    {
+                        cmd.CommandText = @"SELECT Id, Name, StartDate, EndDate, MaxAttendees FROM TrainingProgram
+                                                       WHERE StartDate > GetDate()";
+
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+
+                        while (reader.Read())
+                        {
+                            TrainingProgram trainingProgram = new TrainingProgram
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+
+                            };
+                            trainingPrograms.Add(trainingProgram);
+                        }
+                        reader.Close();
+                        return View(trainingPrograms);
+                    }
                 }
+                    
+                   
             }
             
         }
@@ -275,6 +307,40 @@ namespace BangazonWorkforceMVC.Controllers
                 }
                     
             }
+        }
+
+        private List<TrainingProgram> GetPastTrainingPrograms()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, Name, StartDate, EndDate, MaxAttendees FROM TrainingProgram
+                                         WHERE StartDate < GetDate()";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+                    
+
+                    while (reader.Read())
+                    {
+                        trainingPrograms.Add(new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+
+                        });
+                       
+                    }
+                    reader.Close();
+                    return trainingPrograms;
+                }
+            }
+
         }
     }
 }
