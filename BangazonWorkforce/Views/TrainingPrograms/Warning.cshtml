@@ -1,0 +1,14 @@
+﻿@model IEnumerable<BangazonWorkforceMVC.Models.TrainingProgram>
+
+@{
+    ViewData["ALERT!"] = "Warning";
+}
+
+<h1>TP_Warning</h1>
+
+<p>You are not allowed to edit past programs!</p>
+<a asp-action="Index">Back to List</a>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
