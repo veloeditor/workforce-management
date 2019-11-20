@@ -45,6 +45,12 @@
         <hr />
     </div>
 </div>
+@if (Model.EmployeeList.Count == 0)
+{
+    <p>No employees have been assigned</p>
+}
+else
+{
     <table class="table">
         <h6>Employees Enrolled</h6>
         <thead>
@@ -58,12 +64,13 @@
                 </th>
             </tr>
         </thead>
+
         <tbody>
             @foreach (Employee employee in Model.EmployeeList)
             {
                 <tr>
                     <td>
-                        <a href="@Url.Action("Details", "Employees", new { Id=employee.Id})">@Html.DisplayFor(modelItem => employee.FirstName)</a>
+                        <a href="@Url.Action("Details", "Employees", new { Id = employee.Id })">@Html.DisplayFor(modelItem => employee.FirstName)</a>
                     </td>
 
                     <td>
@@ -72,6 +79,7 @@
                 </tr>
             }
         </tbody>
-       </table>
-
+        
+    </table>
+}
 

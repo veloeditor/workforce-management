@@ -5,10 +5,10 @@
     ViewData["Title"] = "Details";
 }
 
-    <h1>@Html.DisplayFor(model => model.Name)</h1>
-            
-        
-    
+<h1>@Html.DisplayFor(model => model.Name)</h1>
+
+
+
 
 <div>
     <h4>Department</h4>
@@ -24,32 +24,39 @@
             @Html.DisplayNameFor(model => model.Name)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name) 
+            @Html.DisplayFor(model => model.Name)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Budget)
         </dt>
         <dd class="col-sm-10">
-           $@Html.DisplayFor(model => model.Budget)
+            $@Html.DisplayFor(model => model.Budget)
         </dd>
 
     </dl>
 </div>
 <div>
-    <h4>
-        @Html.DisplayFor(model => model.Name) Employees
-    </h4>
-    <hr />
-    @foreach (Employee employee in Model.employees)
+    @if (Model.employees.Count == 0)
     {
-<dl class="row">
-    <td>
-        <a href="@Url.Action("Details", "Employees", new { Id=employee.Id})">@Html.DisplayFor(modelItem => employee.FirstName)</a>
-    </td>
+        <p>No employees have been assigned</p>
+    }
+    else
+    {
+        <h4>
+            @Html.DisplayFor(model => model.Name) Employees
+        </h4>
+        <hr />
+        @foreach (Employee employee in Model.employees)
+        {
+            <dl class="row">
+                <td>
+                    <a href="@Url.Action("Details", "Employees", new { Id = employee.Id })">@Html.DisplayFor(modelItem => employee.FirstName)</a>
+                </td>
 
 
 
-</dl>
+            </dl>
+        }
     }
 </div>
 <div>
