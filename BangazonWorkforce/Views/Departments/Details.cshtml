@@ -5,7 +5,10 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+    <h1>@Html.DisplayFor(model => model.Name)</h1>
+            
+        
+    
 
 <div>
     <h4>Department</h4>
@@ -21,34 +24,34 @@
             @Html.DisplayNameFor(model => model.Name)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.Name) 
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Budget)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Budget)
+           $@Html.DisplayFor(model => model.Budget)
         </dd>
+
     </dl>
 </div>
 <div>
     <h4>
-        Employees Assigned To Department
+        @Html.DisplayFor(model => model.Name) Employees
     </h4>
     <hr />
     @foreach (Employee employee in Model.employees)
     {
-        <dl class="row">
-            <dt class="col-sm-2">
+<dl class="row">
+    <td>
+        <a href="@Url.Action("Details", "Employees", new { Id=employee.Id})">@Html.DisplayFor(modelItem => employee.FirstName)</a>
+    </td>
 
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => employee.FullName)
-            </dd>
 
-        </dl>
+
+</dl>
     }
 </div>
 <div>
-    <a asp-action="Departments">Back to List</a>
+    <a asp-action="Index">Back to List</a>
 </div>

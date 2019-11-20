@@ -1,17 +1,17 @@
 ﻿@model BangazonWorkforceMVC.Models.Computer
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = @Html.DisplayNameFor(model => model.Id) ;
 }
 
-<h1>Details</h1>
+<h1>@Html.DisplayFor(model => model.Manufacturer)</h1>
+<h1>@Html.DisplayFor(model => model.Make)</h1>
 
 <div>
-    <h4>Computer</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Id)
+            @Html.DisplayNameFor(model => model.Id) 
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Id)
