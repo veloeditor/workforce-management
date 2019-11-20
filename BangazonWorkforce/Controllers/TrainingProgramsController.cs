@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BangazonWorkforce.Models.ViewModels;
+
 using BangazonWorkforceMVC.Models;
 using BangazonWorkforceMVC.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -187,34 +187,46 @@ namespace BangazonWorkforceMVC.Controllers
         }
 
 
-        // GET: TrainingPrograms/Edit/5
+        // GET: TrainingProgram/Edit/5
         public ActionResult Edit(int id)
         {
             TrainingProgram trainingProgram = GetTrainingProgramById(id);
-            return View(trainingProgram);
+            DateTime currentDate = DateTime.Now;
+        
+            if (trainingProgram.StartDate > currentDate)
+            {
+                TrainingProgramEditViewModel viewModel = new TrainingProgramEditViewModel
+                {
+                    TrainingProgram = trainingProgram
+                };
+                return View(viewModel);
+            }
+
+            return Ok("You are not allowed to edit past training programs. Please use the browser's back button to continue.");
         }
 
         // POST: TrainingPrograms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, TrainingProgram updatedTrainingProgram)
+        public ActionResult Edit(int id, TrainingProgramEditViewModel viewModel)
         {
+            TrainingProgram trainingProgram = viewModel.TrainingProgram;
             try
             {
+                var updatedTrainingProgram = viewModel.TrainingProgram;
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"UPDATE TrainingProgram
-                                               SET Name = @name, StartDate = @startDate, EndDate = @endDate, MaxAttendees = @maxAttendees
-                                             WHERE Id = @id";
+                                            SET Name = @name, StartDate = @startDate, EndDate = @endDate, MaxAttendees = @maxAttendees
+                                            WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@name", updatedTrainingProgram.Name));
                         cmd.Parameters.Add(new SqlParameter("@startDate", updatedTrainingProgram.StartDate));
                         cmd.Parameters.Add(new SqlParameter("@endDate", updatedTrainingProgram.EndDate));
                         cmd.Parameters.Add(new SqlParameter("@maxAttendees", updatedTrainingProgram.MaxAttendees));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
-
                         cmd.ExecuteNonQuery();
                     }
                 }

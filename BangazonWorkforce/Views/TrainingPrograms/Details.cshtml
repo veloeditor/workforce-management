@@ -58,7 +58,7 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => employee.FirstName)
+                        <a href="@Url.Action("Details", "Employees", new { Id=employee.Id})">@Html.DisplayFor(modelItem => employee.FirstName)</a>
                     </td>
 
                     <td>
