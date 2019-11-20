@@ -13,7 +13,7 @@ using BangazonWorkforceMVC.Models.ViewModels;
 
 namespace BangazonWorkforceMVC.Controllers
 {
-    public class DepartmentsController : Controller  
+    public class DepartmentsController : Controller
     {
         private string _connectionString;
         private SqlConnection Connection
@@ -37,19 +37,25 @@ namespace BangazonWorkforceMVC.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT d.id, d.Name, d.Budget                                             
-                                          FROM Department d
-                                      ORDER BY d.Name, d.Budget";
+                    cmd.CommandText = @"SELECT d.Id as DepartmentId, d.Budget as Budget, d.Name as Department,
+                                      COUNT(*) as TotalEmployees
+                                          FROM Department d Left JOIN Employee e on e.DepartmentId = d.Id
+                                          GROUP BY d.Id, d.Name, d.Budget";
+
                     var reader = cmd.ExecuteReader();
                     var departments = new List<Department>();
+
+
+
                     while (reader.Read())
                     {
                         departments.Add(
                             new Department
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Name = reader.GetString(reader.GetOrdinal("Name")),
-                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Name = reader.GetString(reader.GetOrdinal("Department")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
+                                TotalEmployees = reader.GetInt32(reader.GetOrdinal("TotalEmployees"))
                             });
                     }
 
@@ -67,10 +73,10 @@ namespace BangazonWorkforceMVC.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT d.Id as DepartmentId, d.Name as DepartmentName, d.Budget as DepartmentBudget, e.Id as EmployeeId, 
-                                               e.FirstName + ' ' + e.LastName as DepartmentEmployee
+                    cmd.CommandText = @"SELECT d.Id as DepartmentId, d.Name as Department, d.Budget as Budget, e.Id as EmployeeId, 
+                                               e.FirstName + ' ' + e.LastName as Employee
                                           FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId
-                                          WHERE d.Id = @id";
+                                         WHERE d.Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -85,8 +91,8 @@ namespace BangazonWorkforceMVC.Controllers
                             Department newDepartment = new Department
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                                Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
-                                Budget = reader.GetInt32(reader.GetOrdinal("DepartmentBudget")),
+                                Name = reader.GetString(reader.GetOrdinal("Department")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                             };
                             department.Add(departmentId, newDepartment);
                         }
@@ -97,8 +103,8 @@ namespace BangazonWorkforceMVC.Controllers
                             Employee employee = new Employee
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
-                                FirstName = reader.GetString(reader.GetOrdinal("DepartmentEmployee")),
-                                
+                                FirstName = reader.GetString(reader.GetOrdinal("Employee")),
+
 
                             };
                             fromDictionary.employees.Add(employee);
@@ -116,69 +122,36 @@ namespace BangazonWorkforceMVC.Controllers
         // GET: Department/Create
         public ActionResult Create()
         {
-            
+
             return View();
         }
 
         // POST: Department/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Department department)
+        public ActionResult Create(Department newDepartment)
         {
-            try
-            {
 
-                using (SqlConnection conn = Connection)
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @" INSERT INTO Department (Name, Budget)
-                                                VALUES (@name, @budget);";
-                        cmd.Parameters.Add(new SqlParameter("@name", department.Name));
-                        cmd.Parameters.Add(new SqlParameter("@budget", department.Budget));
-                        cmd.ExecuteNonQuery();
-                
-                        return RedirectToAction(nameof(Index));
-                    }
-                }
-
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        private List<Employee> GetAllEmployees()
-        {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, FirstName, LastName
-                                  FROM Employee";
-                    var reader = cmd.ExecuteReader();
+                    cmd.CommandText = @"INSERT INTO Department (Name, Budget)
+                                                VALUES (@name, @budget);";
+                    cmd.Parameters.Add(new SqlParameter("@name", newDepartment.Name));
+                    cmd.Parameters.Add(new SqlParameter("@budget", newDepartment.Budget));
 
-                    var employees = new List<Employee>();
-                    while (reader.Read())
-                    {
-                        employees.Add(
-                                new Employee()
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                }
-                            );
-                    }
 
-                    reader.Close();
-
-                    return employees;
+                    cmd.ExecuteNonQuery();
+                    return RedirectToAction(nameof(Index));
                 }
             }
+
         }
     }
 }
+
+
+        
+      

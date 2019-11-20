@@ -6,14 +6,18 @@ using BangazonWorkforceMVC.Models;
 namespace BangazonWorkforceMVC.Models
 {
     public class Department
-    {
+    {   [Required]
         public int Id { get; set; }
 
         [Required]
         public string Name { get; set; }
 
         [Required]
-        public int Budget { get; set; }
+        
+        public decimal Budget { get; set; }
+        [Display(Name="Department Size")]
+        public int TotalEmployees { get; set; }
+
         public List<Employee> employees { get; set; } = new List<Employee>();
     }
 }
