@@ -1,0 +1,62 @@
+﻿@model BangazonWorkforceMVC.Models.ViewModels.TrainingReportViewModel
+@{
+    ViewData["Title"] = "TrainingProgramReport";
+}
+
+<h1>TrainingProgramReport</h1>
+
+<div class="row">
+    <label for="department-select">Department</label>
+    <select id="department-select" asp-items="@Model.DepartmentOptions"></select>
+</div>
+<div class="row">
+    <canvas id="output"></canvas>
+</div>
+
+@* It's all javascript below this line. Remember this code runs on the client. *@
+@section scripts {
+
+    @*
+        Pull in the chart.js library from a Content Delivery Network (CDN)
+
+        Chart.js documentation
+        https://www.chartjs.org/docs/latest/getting-started/
+    *@
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script>
+
+    function getStudentsInCohort(cohortId) {
+        // Hit the API running in our .net app
+        return fetch(`/api/StudentExerciseReportAPI/${cohortId}`)
+            .then(resp => resp.json());
+    }
+
+    const cohortSelect = document.getElementById('cohort-select');
+    const output = document.getElementById('output').getContext('2d');
+    let chart = null;
+
+    cohortSelect.addEventListener("change", (evt) => {
+        // If we already have a chart, destroy it to make room for the next one.
+        if (chart) {
+            chart.destroy();
+        }
+
+        const selectedCohortId = evt.target.value;
+
+        getStudentsInCohort(selectedCohortId)
+            .then(students => {
+                chart = new Chart(output, {
+                    type: 'bar',
+                    data: {
+                        labels: students.map(s => `${s.firstName} ${s.lastName}`),
+                        datasets: [{
+                            label: "Exercise Count",
+                            data: students.map(s => s.exerciseCount)
+                        }]
+                    }
+                });
+            });
+    });
+    </script>
+}
+
