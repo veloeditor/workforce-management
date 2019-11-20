@@ -6,7 +6,7 @@ using BangazonWorkforceMVC.Models;
 namespace BangazonWorkforceMVC.Models
 {
     public class Department
-    {
+    {   [Required]
         public int Id { get; set; }
 
         [Required]

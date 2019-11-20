@@ -129,7 +129,7 @@ namespace BangazonWorkforceMVC.Controllers
         // POST: Department/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Department department)
+        public async Task<ActionResult> Create(Department department)
         {
             try
             {
@@ -139,15 +139,15 @@ namespace BangazonWorkforceMVC.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @" INSERT INTO Department (Name, Budget, TotalEmployees)
-                                                VALUES (@name, @budget, @totalemployees);";
+                        cmd.CommandText = @"INSERT INTO Department (Name, Budget)
+                                                VALUES (@name, @budget);";
                         cmd.Parameters.Add(new SqlParameter("@name", department.Name));
                         cmd.Parameters.Add(new SqlParameter("@budget", department.Budget));
-                        cmd.Parameters.Add(new SqlParameter("@totalemployees", department.TotalEmployees));
 
-                        cmd.ExecuteNonQuery();
-                
-                        return RedirectToAction(nameof(Index));
+
+                        department.Id = (int)await cmd.ExecuteScalarAsync();
+
+                return RedirectToAction(nameof(Index));
                     }
                 }
 
