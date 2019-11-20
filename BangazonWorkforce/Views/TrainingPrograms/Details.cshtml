@@ -6,11 +6,11 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>Training Programs</h1>
 
 
 <div>
-    <h4>TrainingProgram</h4>
+    <h4>Details</h4>
     <hr />
     <dl class="row">
 
@@ -39,6 +39,11 @@
             @Html.DisplayFor(model => model.MaxAttendees)
         </dd>
     </dl>
+    <div>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        <a asp-action="Index">Back to List</a>
+        <hr />
+    </div>
 </div>
     <table class="table">
         <h6>Employees Enrolled</h6>
@@ -69,7 +74,4 @@
         </tbody>
        </table>
 
-<div>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    <a asp-action="Index">Back to List</a>
-</div>
+
