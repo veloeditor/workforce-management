@@ -29,7 +29,7 @@ namespace BangazonWorkforceMVC.Controllers
             }
         }
         // GET: Computers
-        public ActionResult Index()
+        public ActionResult Index(string SearchString)
         {
             using (SqlConnection conn = Connection)
             {
@@ -48,6 +48,16 @@ namespace BangazonWorkforceMVC.Controllers
                                        FROM ComputerEmployee ce
                                        LEFT JOIN Employee e ON e.Id = ce.EmployeeId
                                        FULL OUTER JOIN Computer c ON c.Id = ce.ComputerId";
+
+                    if (SearchString != null)
+                    {
+                        cmd.CommandText += @" WHERE 
+							c.Make LIKE '%' + @SearchString + '%' OR
+							c.Manufacturer LIKE '%' + @SearchString + '%' 
+						    ";
+                        cmd.Parameters.Add(new SqlParameter("@SearchString", SearchString));
+                    }
+
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<ComputerEmployeeViewModel> computersEmployees = new List<ComputerEmployeeViewModel>();
