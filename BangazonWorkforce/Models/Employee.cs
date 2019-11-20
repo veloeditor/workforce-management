@@ -24,6 +24,7 @@ namespace BangazonWorkforceMVC.Models
             }
         }
         [Required]
+        [Display(Name = "Department Name")]
         public int DepartmentId { get; set; }
         public bool IsSupervisor { get; set; }
         [Required]
