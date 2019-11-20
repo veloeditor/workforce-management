@@ -13,7 +13,6 @@ namespace BangazonWorkforceMVC.Models
         public string Name { get; set; }
 
         [Required]
-        
         public decimal Budget { get; set; }
         [Display(Name="Department Size")]
         public int TotalEmployees { get; set; }

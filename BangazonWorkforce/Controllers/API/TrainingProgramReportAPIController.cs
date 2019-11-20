@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BangazonWorkforceMVC.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -34,35 +35,35 @@ namespace BangazonWorkforceMVC.Controllers.API
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"SELECT et.EmployeeId, et.TrainingProgramId
-                                               COUNT(et.TrainingProgramId) AS TrainingsCount
-                                          fROM EmployeeTraining
-                                               LEFT JOIN Employee e on e.id = et.EmployeeId
-                                               LEFT JOIN Department d on e.DepartmentId = d.Id
-                                           
-                                         WHERE e.DepartmentId = @id
-WE STOPPED HERE
-
-                                      GROUP BY s.id, s.FirstName, s.LastName, s.SlackHandle";
+                        cmd.CommandText = @"SELECT  
+		                                        e.FirstName, e.LastName, e.DepartmentId,
+		                                        d.Name AS DEPARTMENT_NAME,
+		                                        COUNT(*) AS EMP_Count
+	                                        FROM EmployeeTraining et
+	                                        LEFT JOIN Employee e ON e.Id = et.EmployeeId
+	                                        LEFT JOIN Department d ON d.Id = e.DepartmentId
+	                                        WHERE d.Id = @id
+	                                        GROUP BY e.FirstName, e.LastName, e.DepartmentId,
+		                                        d.Name";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
                         var reader = cmd.ExecuteReader();
 
-                        var students = new List<StudentExerciseCount>();
+                        var TPs = new List<EmployeeTrainingsCount>();
                         while (reader.Read())
                         {
-                            students.Add(
-                                new StudentExerciseCount
+                            TPs.Add(
+                                new EmployeeTrainingsCount
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("firstname")),
-                                    LastName = reader.GetString(reader.GetOrdinal("lastname")),
-                                    SlackHandle = reader.GetString(reader.GetOrdinal("slackhandle")),
-                                    ExerciseCount = reader.GetInt32(reader.GetOrdinal("ExerciseCount")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                    DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                    DepartmentName = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                                    TrainingsCount = reader.GetInt32(reader.GetOrdinal("TrainingsCount")),
                                 });
                         }
 
                         reader.Close();
-                        return Ok(students);
+                        return Ok(TPs);
                     }
                 }
             }
