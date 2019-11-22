@@ -1,5 +1,4 @@
-# Workforce Management -- NSS Sprint #2 for a fictitious e-commerce site called Bangazon
-
+# Workforce Management -- NSS Sprint #2
 # Bangazon Workforce Management Application
 
 ## Setup
